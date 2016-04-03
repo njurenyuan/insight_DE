@@ -1,22 +1,20 @@
 import json
-import os
-import time
 from datetime import datetime
 from collections import deque
 
-if os.path.exists(r"../tweet_input/tweets.txt"):
-    fin = open(r"../tweet_input/tweets.txt", 'r')
-else:
-    print "Error: tweets.txt not found!"
-if not os.path.exists(r"../tweet_output"):
-    os.makedirs(r"../tweet_output")
+class edge_group():
+    def __init__(self, timestamp):
+        self.timestamp = timestamp
+        self.edges = []
+
+fin = open(r"../tweet_input/tweets.txt", 'r')
 fout = open(r"../tweet_output/output.txt", 'w')
 edges = deque()
 nodes = {}
 timestamp_max = 0
 unix_origin = datetime(1970, 1, 1)
 total_edges = 0
-total_nodes = 0 
+total_nodes = 0
 while True:
     tweet = fin.readline()
     if len(tweet) == 0:
@@ -42,17 +40,17 @@ while True:
             if length > 1:
                 # find out which group new edges need to be added
                 if len(edges) == 0:
-                    edges.append([timestamp, []])
-                    new_edge_group = edges[-1][1]
+                    edges.append(edge_group(timestamp))
+                    new_edge_group = edges[-1]
                 else:
-                    if timestamp > edges[-1][0]:
-                        time_max = edges[-1][0]
+                    if timestamp > edges[-1].timestamp:
+                        time_max = edges[-1].timestamp
                         n_new_group = int(timestamp - time_max) 
                         for i in range(n_new_group):
-                            edges.append([time_max+i+1, []])
-                        new_edge_group = edges[-1][1]
+                            edges.append(edge_group(time_max+i+1))
+                        new_edge_group = edges[-1]
                     else:
-                        new_edge_group = edges[int(timestamp - edges[0][0])][1]
+                        new_edge_group = edges[int(timestamp - edges[0].timestamp)]
                 # add edges into the group
                 pointer = 0
                 while pointer < length - 1:
@@ -62,9 +60,9 @@ while True:
                             continue
                         new_edge = [p, h] if p > h else [h, p]
                         # if the edge already exists, remove it from old group
-                        for ts, edge_group in edges:
-                            if new_edge in edge_group:
-                                edge_group.remove(new_edge)
+                        for group in edges:
+                            if new_edge in group.edges:
+                                group.edges.remove(new_edge)
                                 break
                         else:
                             total_edges += 1
@@ -74,14 +72,14 @@ while True:
                                 else:
                                     nodes[n] = 1
                                     total_nodes += 1
-                        new_edge_group.append(new_edge)
+                        new_edge_group.edges.append(new_edge)
                     pointer += 1
             # remove old edges
             try:
-                while timestamp_max - edges[0][0] >= 60:
-                    ts, old_edges = edges.popleft()
-                    total_edges -= len(old_edges)
-                    for e in old_edges:  # remove nodes in old edges
+                while timestamp_max - edges[0].timestamp >= 60:
+                    old_edge_group = edges.popleft()
+                    total_edges -= len(old_edge_group.edges)
+                    for e in old_edge_group.edges:  # remove nodes in old edges
                         for n in e:
                             if nodes[n] > 1:
                                 nodes[n] -= 1
