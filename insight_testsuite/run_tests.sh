@@ -31,8 +31,8 @@ function find_file_or_dir_in_project {
 function check_project_struct {
   find_file_or_dir_in_project ${PROJECT_PATH} run.sh
   find_file_or_dir_in_project ${PROJECT_PATH} src
-  find_file_or_dir_in_project ${PROJECT_PATH} tweet_input
-  find_file_or_dir_in_project ${PROJECT_PATH} tweet_output
+  find_file_or_dir_in_project ${PROJECT_PATH} venmo_input
+  find_file_or_dir_in_project ${PROJECT_PATH} venmo_output
 }
 
 # setup testing output folder
@@ -46,17 +46,17 @@ function setup_testing_input_output {
 
   cp -r ${PROJECT_PATH}/src ${TEST_OUTPUT_PATH}
   cp -r ${PROJECT_PATH}/run.sh ${TEST_OUTPUT_PATH}
-  cp -r ${PROJECT_PATH}/tweet_input ${TEST_OUTPUT_PATH}
-  cp -r ${PROJECT_PATH}/tweet_output ${TEST_OUTPUT_PATH}
+  cp -r ${PROJECT_PATH}/venmo_input ${TEST_OUTPUT_PATH}
+  cp -r ${PROJECT_PATH}/venmo_output ${TEST_OUTPUT_PATH}
 
-  rm -r ${TEST_OUTPUT_PATH}/tweet_input/*
-  rm -r ${TEST_OUTPUT_PATH}/tweet_output/*
-  cp -r ${GRADER_ROOT}/tests/${test_folder}/tweet_input/tweets.txt ${TEST_OUTPUT_PATH}/tweet_input/tweets.txt
+  rm -r ${TEST_OUTPUT_PATH}/venmo_input/*
+  rm -r ${TEST_OUTPUT_PATH}/venmo_output/*
+  cp -r ${GRADER_ROOT}/tests/${test_folder}/venmo_input/venmo-trans.txt ${TEST_OUTPUT_PATH}/venmo_input/venmo-trans.txt
 }
 
 function compare_outputs {
-  PROJECT_ANSWER_PATH=${GRADER_ROOT}/temp/tweet_output/output.txt
-  TEST_ANSWER_PATH=${GRADER_ROOT}/tests/${test_folder}/tweet_output/output.txt
+  PROJECT_ANSWER_PATH=${GRADER_ROOT}/temp/venmo_output/output.txt
+  TEST_ANSWER_PATH=${GRADER_ROOT}/tests/${test_folder}/venmo_output/output.txt
 
   DIFF_RESULT=$(diff -bB ${PROJECT_ANSWER_PATH} ${TEST_ANSWER_PATH} | wc -l)
   if [ "${DIFF_RESULT}" -eq "0" ] && [ -f ${PROJECT_ANSWER_PATH} ]; then
@@ -90,4 +90,3 @@ function run_all_tests {
 
 check_project_struct
 run_all_tests
-
